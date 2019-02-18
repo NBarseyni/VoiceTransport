@@ -2,7 +2,6 @@ package com.bartholome.voicetransport;
 
 import java.util.ArrayList;
 
-//import android.app.ActionBar;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -29,14 +28,22 @@ import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
     private static final int REQUEST_CODE = 1234;
-    Button Start;
-    TextView Speech;
-    Dialog match_text_dialog;
-    ListView textlist;
-    ArrayList<String> matches_text;
+    private Button Start;
+    private TextView Speech;
+    private Dialog match_text_dialog;
+    private ListView textlist;
+    private ArrayList<String> matches_text;
 
     private DrawerLayout mDrawerLayout;
 
@@ -69,7 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
         Start = findViewById(R.id.start_reg);
         Speech = findViewById(R.id.speech);
-
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
         Start.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
     }
-    public  boolean isConnected()
+    private  boolean isConnected()
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo net = cm.getActiveNetworkInfo();
@@ -130,5 +140,24 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }

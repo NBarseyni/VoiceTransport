@@ -10,4 +10,5 @@
 
     <!-- Navigation drawer -->
     <string name="nav_advancedResearch">Recherche avancée</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
