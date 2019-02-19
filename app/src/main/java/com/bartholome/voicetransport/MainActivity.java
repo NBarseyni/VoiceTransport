@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Dialog match_text_dialog;
     private ListView textlist;
     private ArrayList<String> matches_text;
+    private String depart = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             match_text_dialog = new Dialog(MainActivity.this);
             match_text_dialog.setContentView(R.layout.dialog_matches_frag);
-            match_text_dialog.setTitle("Select Matching Text");
+            match_text_dialog.setTitle("Choisissez le terme qui correspond à votre demande");
             textlist = match_text_dialog.findViewById(R.id.list);
             matches_text = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                     Speech.setText("Vous avez dis " +matches_text.get(position));
+                    depart = matches_text.get(position);
                     match_text_dialog.hide();
                 }
             });
@@ -111,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        /*LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 }
