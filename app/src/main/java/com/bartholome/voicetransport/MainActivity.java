@@ -1,6 +1,9 @@
 package com.bartholome.voicetransport;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,7 +18,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,12 +31,17 @@ import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.DirectionsApi;
+import com.google.maps.GeoApiContext;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
+import org.joda.time.DateTime;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -44,8 +52,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Dialog match_text_dialog;
     private ListView textlist;
     private ArrayList<String> matches_text;
+    private String resultatVocal ="";
 
     private DrawerLayout mDrawerLayout;
+    DateTime now = new DateTime();
+
+
+    private DirectionsResult result;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                     startActivityForResult(intent, REQUEST_CODE);
+
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Veuillez vous connecter à internet pour pouvoir utiliser notre service", Toast.LENGTH_LONG).show();
@@ -123,14 +139,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                     Speech.setText("Vous avez dis " +matches_text.get(position));
+                    resultatVocal = matches_text.get(position);
                     match_text_dialog.hide();
+                    try {
+                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
+                                .origin(resultatVocal)
+                                .destination(resultatVocal).departureTime(now).await();
+                        addMarkersToMap(result, mMap);
+                    }
+                    catch(IOException  | InterruptedException | ApiException e)
+                    {
+                        Log.d("truc", "onItemClick: "+e);
+                    }
+
                 }
             });
             match_text_dialog.show();
-
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    private GeoApiContext getGeoContext() {
+        GeoApiContext geoApiContext = new GeoApiContext();
+        return geoApiContext.setQueryRateLimit(3).setApiKey("AIzaSyBMyROAu-fqq_AeEZV-a8RFsl7Vf3NN0Pw").setConnectTimeout(1, TimeUnit.SECONDS)
+                .setReadTimeout(1, TimeUnit.SECONDS).setWriteTimeout(1, TimeUnit.SECONDS);
+    }
+
+    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
+    }
+    private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable;}
+   /*private void addPolyline(DirectionsResult results, GoogleMap mMap) {List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
+        mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+    }*/
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -156,8 +200,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //LatLng sydney = new LatLng(-34, 151);
+       // mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
 }
