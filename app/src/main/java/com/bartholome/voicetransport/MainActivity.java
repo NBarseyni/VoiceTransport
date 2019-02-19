@@ -5,11 +5,18 @@ import java.util.ArrayList;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -18,6 +25,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,11 +44,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Dialog match_text_dialog;
     private ListView textlist;
     private ArrayList<String> matches_text;
-    private String depart = "";
+
+    private DrawerLayout mDrawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Drawer navigation
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                }
+        );
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24px);
+
+
         Start = findViewById(R.id.start_reg);
         Speech = findViewById(R.id.speech);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -77,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             match_text_dialog = new Dialog(MainActivity.this);
             match_text_dialog.setContentView(R.layout.dialog_matches_frag);
-            match_text_dialog.setTitle("Choisissez le terme qui correspond à votre demande");
+            match_text_dialog.setTitle("Select Matching Text");
             textlist = match_text_dialog.findViewById(R.id.list);
             matches_text = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
@@ -89,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                     Speech.setText("Vous avez dis " +matches_text.get(position));
-                    depart = matches_text.get(position);
                     match_text_dialog.hide();
                 }
             });
@@ -97,6 +130,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -113,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
+        LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 }
