@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GeoApiContext getGeoContext() {
         GeoApiContext geoApiContext = new GeoApiContext();
-        return geoApiContext.setQueryRateLimit(3).setApiKey("AIzaSyBMyROAu-fqq_AeEZV-a8RFsl7Vf3NN0Pw").setConnectTimeout(1, TimeUnit.SECONDS)
+        return geoApiContext.setQueryRateLimit(3).setApiKey("AIzaSyBF3Fc9dPjIDPLRdl-ZbJHQbPsaXS4jE94").setConnectTimeout(1, TimeUnit.SECONDS)
                 .setReadTimeout(1, TimeUnit.SECONDS).setWriteTimeout(1, TimeUnit.SECONDS);
     }
 

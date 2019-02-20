@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "856565018696",
+    "firebase_url": "https://voicetransport.firebaseio.com",
+    "project_id": "voicetransport",
+    "storage_bucket": "voicetransport.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856565018696:android:58bd90d91c6de5e5",
+        "android_client_info": {
+          "package_name": "com.bartholome.voicetransport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856565018696-p3mogolrs903rrcpvrscvc2cnkcusu0d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bartholome.voicetransport",
+            "certificate_hash": "bc59d50ed2cf9c67746416eeaaeb2161b9ea272c"
+          }
+        },
+        {
+          "client_id": "856565018696-1v7s0ikvo5qeoqcv9mlb1rsv0et5ntdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF3Fc9dPjIDPLRdl-ZbJHQbPsaXS4jE94"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "856565018696-tsoib3t46nauebegcffmonqhttq97dp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
