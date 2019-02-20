@@ -203,9 +203,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker in Sydney and move the camera
         LatLng Paris = new LatLng(48.8534,  2.3488);
        // mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.setMinZoomPreference(15.0f);
-        //mMap.setMaxZoomPreference(16.0f);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Paris));
+        //mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Paris, 15.0f));
     }
 
 }
