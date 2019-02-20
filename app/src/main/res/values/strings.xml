@@ -12,4 +12,7 @@
     <!-- Navigation drawer -->
     <string name="nav_advancedResearch">Recherche avancée</string>
     <string name="title_activity_maps">Map</string>
+    <string name="searchButton">Rechercher</string>
+    <string name="advancedResearchTitle">Recherche avancée</string>
+    <string name="hour_TextView">Heures</string>
 </resources>
