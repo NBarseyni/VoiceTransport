@@ -75,9 +75,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
+                        //menuItem.setChecked(false);
+                        onOptionsItemSelected(menuItem);
                         mDrawerLayout.closeDrawers();
-                        return true;
+                        return false;
                     }
                 }
         );
@@ -178,10 +179,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.nav_advancedResearch:
+                intent = new Intent(MainActivity.this, AdvancedResearchActivity.class);
+                MainActivity.this.startActivity(intent);
+            case R.id.nav_details:
+                // TODO: Ajouter activité détails
         }
         return super.onOptionsItemSelected(item);
     }
