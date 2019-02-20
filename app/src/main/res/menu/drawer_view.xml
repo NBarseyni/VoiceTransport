@@ -4,5 +4,8 @@
         <item
             android:id="@+id/nav_advancedResearch"
             android:title="@string/nav_advancedResearch"/>
+        <item
+            android:id="@+id/nav_details"
+            android:title="Détails"/>
     </group>
 </menu>
