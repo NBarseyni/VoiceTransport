@@ -7,6 +7,7 @@
     <string name="end_TextView">Arrivée</string>
     <string name="time_TextView">Temps</string>
     <string name="travel_TextView">Trajets</string>
+    <string name="google_maps_key">AIzaSyBF3Fc9dPjIDPLRdl-ZbJHQbPsaXS4jE94</string>
 
     <!-- Navigation drawer -->
     <string name="nav_advancedResearch">Recherche avancée</string>
