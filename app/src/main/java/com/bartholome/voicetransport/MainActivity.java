@@ -18,6 +18,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,25 +40,29 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import org.joda.time.DateTime;
-
+import com.google.maps.android.PolyUtil;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final int REQUEST_CODE = 1234;
+
     private Button Start;
     private TextView Speech;
     private Dialog match_text_dialog;
     private ListView textlist;
     private ArrayList<String> matches_text;
     private String resultatVocal ="";
-
+    private EditText startPoint, endPoint;
     private DrawerLayout mDrawerLayout;
+    private int nbFois = 0;
     DateTime now = new DateTime();
 
 
@@ -67,7 +74,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        startPoint = findViewById(R.id.start_EditText);
+        endPoint = findViewById(R.id.end_EditText);
         // Drawer navigation
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
@@ -101,16 +109,78 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 if(isConnected()){
-                    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                    startActivityForResult(intent, REQUEST_CODE);
-
+                        Toast.makeText(getApplicationContext(), "Veuillez donner votre station de départ ", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                        startActivityForResult(intent, REQUEST_CODE);
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Veuillez vous connecter à internet pour pouvoir utiliser notre service", Toast.LENGTH_LONG).show();
-                }}
+                }
+            }
+        });
+        startPoint.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!endPoint.getText().toString().equals(""))
+                {
+                    try {
+                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
+                                .origin(startPoint.getText().toString())
+                                .destination(endPoint.getText().toString()).departureTime(now).await();
+                                addMarkersToMap(result, mMap);
+                        //addMarkersToMap(result, mMap);
+                        //addPolyline(result, mMap);
+
+
+                    }
+                    catch(IOException  | InterruptedException | ApiException e)
+                    {
+                        Log.d("Erreur", "onItemClick: "+e);
+                    }
+                }
+            }
+        });
+        endPoint.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!startPoint.getText().toString().equals(""))
+                {
+                    try {
+                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
+                                .origin(startPoint.getText().toString())
+                                .destination(endPoint.getText().toString()).departureTime(now).await();
+                        addMarkersToMap(result, mMap);
+                        addPolyline(result, mMap);
+
+                    }
+                    catch(IOException  | InterruptedException | ApiException e)
+                    {
+                        Log.d("Erreur", "onItemClick: "+e);
+                    }
+                }
+            }
         });
     }
     private  boolean isConnected()
@@ -126,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-
             match_text_dialog = new Dialog(MainActivity.this);
             match_text_dialog.setContentView(R.layout.dialog_matches_frag);
             match_text_dialog.setTitle("Select Matching Text");
@@ -143,17 +212,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Speech.setText("Vous avez dis " +matches_text.get(position));
                     resultatVocal = matches_text.get(position);
                     match_text_dialog.hide();
-                    try {
-                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
-                                .origin(resultatVocal)
-                                .destination(resultatVocal).departureTime(now).await();
-                        addMarkersToMap(result, mMap);
-                    }
-                    catch(IOException  | InterruptedException | ApiException e)
-                    {
-                        Log.d("truc", "onItemClick: "+e);
-                    }
-
+                    if(startPoint.getText().toString().equals(""))
+                        startPoint.setText(resultatVocal);
+                    else
+                        endPoint.setText(resultatVocal);
                 }
             });
             match_text_dialog.show();
@@ -172,9 +234,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
     }
     private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable;}
-   /*private void addPolyline(DirectionsResult results, GoogleMap mMap) {List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
+   private void addPolyline(DirectionsResult results, GoogleMap mMap) {List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
         mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
-    }*/
+    }
 
 
 
@@ -206,7 +268,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        //mMap.getUiSettings().setZoomControlsEnabled(true);
+        //mMap.setMyLocationEnabled(true);
         // Add a marker in Sydney and move the camera
         LatLng Paris = new LatLng(48.8534,  2.3488);
        // mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
