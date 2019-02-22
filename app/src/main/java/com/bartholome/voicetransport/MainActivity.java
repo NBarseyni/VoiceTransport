@@ -39,7 +39,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext.Builder;
@@ -61,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String resultatVocal ="";
     private EditText startPoint, endPoint;
     private DrawerLayout mDrawerLayout;
+    private Marker depart;
+    private Marker arrivée;
+    private Polyline direction;
+
 
 
     private DirectionsResult result;
@@ -106,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 if(isConnected()){
+
+                        if(!startPoint.getText().toString().isEmpty() && !endPoint.getText().toString().isEmpty()) {
+                            startPoint.setText("");endPoint.setText("");
+                            depart.remove();arrivée.remove();
+                            direction.remove();
+                        }
                         Toast.makeText(getApplicationContext(), "Veuillez donner votre station de départ ", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -137,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .transitMode(TransitMode.TRAIN)
                                 .origin(startPoint.getText().toString())
                                 .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
-                                addMarkersToMap(result, mMap);
+                                addMarkersToMap(result);
 
 
                     }
@@ -167,8 +179,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.DRIVING)
                                 .origin(startPoint.getText().toString())
                                 .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
-                        addMarkersToMap(result, mMap);
-                        addPolyline(result, mMap);
+                        addMarkersToMap(result);
+                        addPolyline(result);
+                        //Toast.makeText(getApplicationContext(), result.routes[0].legs[0].steps[0]., Toast.LENGTH_LONG).show();
 
                     }
                     catch(IOException  | InterruptedException | ApiException e)
@@ -183,11 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo net = cm.getActiveNetworkInfo();
-        if (net!=null && net.isAvailable() && net.isConnected()) {
-            return true;
-        } else {
-            return false;
-        }
+        return net != null && net.isAvailable() && net.isConnected();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -225,13 +234,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .readTimeout(1, TimeUnit.SECONDS).writeTimeout(1, TimeUnit.SECONDS);
     }
 
-    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
+    private void addMarkersToMap(DirectionsResult results ) {
+        depart = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
+        arrivée = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
     }
     private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable;}
-   private void addPolyline(DirectionsResult results, GoogleMap mMap) {List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
-        mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+   private void addPolyline(DirectionsResult results) {
+        List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
+        direction =  mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
     }
 
 
