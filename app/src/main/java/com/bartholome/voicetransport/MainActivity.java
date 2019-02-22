@@ -1,6 +1,7 @@
 package com.bartholome.voicetransport;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -8,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -43,11 +43,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
+import com.google.maps.GeoApiContext.Builder;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
-import org.joda.time.DateTime;
 import com.google.maps.android.PolyUtil;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText startPoint, endPoint;
     private DrawerLayout mDrawerLayout;
     private int nbFois = 0;
-    DateTime now = new DateTime();
 
 
     private DirectionsResult result;
@@ -136,9 +134,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(!endPoint.getText().toString().equals(""))
                 {
                     try {
-                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
+                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.DRIVING)
                                 .origin(startPoint.getText().toString())
-                                .destination(endPoint.getText().toString()).departureTime(now).await();
+                                .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
                                 addMarkersToMap(result, mMap);
                         //addMarkersToMap(result, mMap);
                         //addPolyline(result, mMap);
@@ -168,9 +166,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(!startPoint.getText().toString().equals(""))
                 {
                     try {
-                        result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.DRIVING)
+                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.DRIVING)
                                 .origin(startPoint.getText().toString())
-                                .destination(endPoint.getText().toString()).departureTime(now).await();
+                                .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
                         addMarkersToMap(result, mMap);
                         addPolyline(result, mMap);
 
@@ -223,10 +221,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private GeoApiContext getGeoContext() {
-        GeoApiContext geoApiContext = new GeoApiContext();
-        return geoApiContext.setQueryRateLimit(3).setApiKey("AIzaSyBuAnhRy95K8XSSehEciHxGTbrlrAtQLj8").setConnectTimeout(1, TimeUnit.SECONDS)
-                .setReadTimeout(1, TimeUnit.SECONDS).setWriteTimeout(1, TimeUnit.SECONDS);
+    private Builder getBuilder() {
+        Builder geoApiContext = new Builder();
+        return geoApiContext.queryRateLimit(3).apiKey("AIzaSyBuAnhRy95K8XSSehEciHxGTbrlrAtQLj8").connectTimeout(1, TimeUnit.SECONDS)
+                .readTimeout(1, TimeUnit.SECONDS).writeTimeout(1, TimeUnit.SECONDS);
     }
 
     private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
