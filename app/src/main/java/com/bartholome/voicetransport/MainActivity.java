@@ -42,12 +42,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
-import com.google.maps.GeoApiContext;
 import com.google.maps.GeoApiContext.Builder;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import com.google.maps.android.PolyUtil;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -56,12 +57,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button Start;
     private TextView Speech;
     private Dialog match_text_dialog;
-    private ListView textlist;
     private ArrayList<String> matches_text;
     private String resultatVocal ="";
     private EditText startPoint, endPoint;
     private DrawerLayout mDrawerLayout;
-    private int nbFois = 0;
 
 
     private DirectionsResult result;
@@ -134,12 +133,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(!endPoint.getText().toString().equals(""))
                 {
                     try {
-                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.DRIVING)
+                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.TRANSIT)
+                                .transitMode(TransitMode.TRAIN)
                                 .origin(startPoint.getText().toString())
                                 .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
                                 addMarkersToMap(result, mMap);
-                        //addMarkersToMap(result, mMap);
-                        //addPolyline(result, mMap);
 
 
                     }
@@ -197,10 +195,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             match_text_dialog = new Dialog(MainActivity.this);
             match_text_dialog.setContentView(R.layout.dialog_matches_frag);
             match_text_dialog.setTitle("Select Matching Text");
-            textlist = match_text_dialog.findViewById(R.id.list);
+            ListView textlist = match_text_dialog.findViewById(R.id.list);
             matches_text = data
                     .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            ArrayAdapter<String> adapter =    new ArrayAdapter<String>(this,
+            ArrayAdapter<String> adapter =    new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1, matches_text);
             textlist.setAdapter(adapter);
             textlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
