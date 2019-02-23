@@ -1,18 +1,16 @@
 package com.bartholome.voicetransport;
 
-import java.time.Duration;
-
 public class Search {
     private long id;
     private String start;
-    private String end;
-    private Duration duration;
+    private String finish;
+    private String duration;
 
     @Override
     public String toString() {
         return "Search{" +
                 ", start='" + start + '\'' +
-                ", end='" + end + '\'' +
+                ", end='" + finish + '\'' +
                 ", duration=" + duration +
                 '}';
     }
@@ -33,19 +31,19 @@ public class Search {
         this.start = start;
     }
 
-    public String getEnd() {
-        return end;
+    public String getFinish() {
+        return finish;
     }
 
-    public void setEnd(String end) {
-        this.end = end;
+    public void setFinish(String end) {
+        this.finish = end;
     }
 
-    public Duration getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 }
