@@ -176,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(!startPoint.getText().toString().equals(""))
                 {
                     try {
-                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.DRIVING)
+                        result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.TRANSIT)
+                                .transitMode(TransitMode.TRAIN)
                                 .origin(startPoint.getText().toString())
                                 .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
                         addMarkersToMap(result);
                         addPolyline(result);
-                        //Toast.makeText(getApplicationContext(), result.routes[0].legs[0].steps[0]., Toast.LENGTH_LONG).show();
 
                     }
                     catch(IOException  | InterruptedException | ApiException e)
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         depart = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
         arrivée = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].startAddress).snippet(getEndLocationTitle(results)));
     }
-    private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable;}
+    private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable; }
    private void addPolyline(DirectionsResult results) {
         List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
         direction =  mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
