@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private DirectionsResult result;
 
-
+    // BDD
+    private SearchDataSource dataSource;
+    private MySQLiteHelper mySQLiteHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +193,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+
+        dataSource = new SearchDataSource(this);
+        dataSource.open();
+        mySQLiteHelper = new MySQLiteHelper(this);
     }
     private  boolean isConnected()
     {
@@ -235,11 +241,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addMarkersToMap(DirectionsResult results ) {
-        depart = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].startLocation.lat,results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
-        arrivée = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[0].legs[0].endLocation.lat,results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].endAddress).snippet(getEndLocationTitle(results)));
+        depart = mMap.addMarker(new MarkerOptions().position(
+                new LatLng(results.routes[0].legs[0].startLocation.lat,
+                        results.routes[0].legs[0].startLocation.lng)).title(results.routes[0].legs[0].startAddress));
+
+        arrivée = mMap.addMarker(new MarkerOptions().position(
+                new LatLng(results.routes[0].legs[0].endLocation.lat,
+                        results.routes[0].legs[0].endLocation.lng)).title(results.routes[0].legs[0].endAddress).snippet(getEndLocationTitle(results)));
+
+        Log.d("startPoint:", startPoint.getText().toString());
+        Log.d("endPoint:", endPoint.getText().toString());
+        Log.d("duree:", result.routes[0].legs[0].duration.humanReadable);
+
+        Search search = dataSource.createSearch(startPoint.getText().toString(), endPoint.getText().toString(), result.routes[0].legs[0].duration.humanReadable);
+
     }
-    private String getEndLocationTitle(DirectionsResult results){ return  "Time :"+ results.routes[0].legs[0].duration.humanReadable + " Distance :" + results.routes[0].legs[0].distance.humanReadable; }
-   private void addPolyline(DirectionsResult results) {
+
+    private String getEndLocationTitle(DirectionsResult results) {
+        return  "Time :"+ results.routes[0].legs[0].duration.humanReadable +
+                " Distance :" + results.routes[0].legs[0].distance.humanReadable;
+    }
+
+    private void addPolyline(DirectionsResult results) {
         List<LatLng> decodedPath = PolyUtil.decode(results.routes[0].overviewPolyline.getEncodedPath());
         direction =  mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
     }
@@ -255,6 +278,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             case R.id.nav_advancedResearch:
                 intent = new Intent(MainActivity.this, AdvancedResearchActivity.class);
+                MainActivity.this.startActivity(intent);
+            case R.id.nav_history:
+                intent = new Intent(MainActivity.this, HistoryActivity.class);
                 MainActivity.this.startActivity(intent);
             case R.id.nav_details:
                 // TODO: Ajouter activité détails

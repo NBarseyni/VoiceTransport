@@ -11,6 +11,7 @@
 
     <!-- Navigation drawer -->
     <string name="nav_advancedResearch">Recherche avancée</string>
+    <string name="nav_history">Historique des recherches</string>
     <string name="title_activity_maps">Map</string>
     <string name="searchButton">Rechercher</string>
     <string name="advancedResearchTitle">Recherche avancée</string>
