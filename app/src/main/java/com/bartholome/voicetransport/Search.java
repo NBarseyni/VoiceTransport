@@ -8,11 +8,7 @@ public class Search {
 
     @Override
     public String toString() {
-        return "Search{" +
-                ", start='" + start + '\'' +
-                ", end='" + finish + '\'' +
-                ", duration=" + duration +
-                '}';
+        return "Départ : " + start + ", Arrivée : " + finish + ", Temps : " + duration;
     }
 
     public long getId() {
