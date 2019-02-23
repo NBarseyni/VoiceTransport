@@ -14,7 +14,8 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".AdvancedResearchActivity"></activity>
+        <activity android:name=".HistoryActivity"></activity>
+        <activity android:name=".AdvancedResearchActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
