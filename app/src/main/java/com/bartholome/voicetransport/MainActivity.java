@@ -279,9 +279,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.nav_advancedResearch:
                 intent = new Intent(MainActivity.this, AdvancedResearchActivity.class);
                 MainActivity.this.startActivity(intent);
+                return true;
             case R.id.nav_history:
                 intent = new Intent(MainActivity.this, HistoryActivity.class);
                 MainActivity.this.startActivity(intent);
+                return true;
             case R.id.nav_details:
                 // TODO: Ajouter activité détails
         }
