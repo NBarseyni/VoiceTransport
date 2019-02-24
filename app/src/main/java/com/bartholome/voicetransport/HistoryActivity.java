@@ -1,15 +1,19 @@
 package com.bartholome.voicetransport;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import org.w3c.dom.Comment;
 
 import java.util.List;
 
-public class HistoryActivity extends ListActivity {
+public class HistoryActivity extends AppCompatActivity {
 
     private SearchDataSource dataSource;
 
@@ -25,7 +29,15 @@ public class HistoryActivity extends ListActivity {
 
         ArrayAdapter<Search> adapter = new ArrayAdapter<Search>(this,
                 android.R.layout.simple_list_item_1, values);
-        setListAdapter(adapter);
+
+        ListView lv = findViewById(R.id.list);
+        lv.setAdapter(adapter);
+
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
+        getSupportActionBar().setTitle("Historique des recherches");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -38,5 +50,11 @@ public class HistoryActivity extends ListActivity {
     protected void onPause() {
         dataSource.close();
         super.onPause();
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(myIntent, 0);
+        return true;
     }
 }
