@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         if(!startPoint.getText().toString().isEmpty() && !endPoint.getText().toString().isEmpty()) {
                             startPoint.setText("");endPoint.setText("");
+                            if(depart != null && arrivée != null)
                             depart.remove();arrivée.remove();
                             direction.remove();
                         }
@@ -184,7 +185,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .destination(endPoint.getText().toString()).departureTime(Instant.now()).await();
                         addMarkersToMap(result);
                         addPolyline(result);
-
+                        LatLng middle = new LatLng((result.routes[0].legs[0].startLocation.lat + result.routes[0].legs[0].endLocation.lat)/2,
+                                (result.routes[0].legs[0].startLocation.lng + result.routes[0].legs[0].endLocation.lng)/2);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(middle, 17.f));
                     }
                     catch(IOException  | InterruptedException | ApiException e)
                     {
