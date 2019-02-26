@@ -75,6 +75,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SearchDataSource dataSource;
     private MySQLiteHelper mySQLiteHelper;
 
+    private void loadMapWithPredefinedValues(Bundle extras)
+    {
+        try {
+            String depart = extras.getString("depart");
+            String arrivee = extras.getString("arrivee");
+            Instant heure = Instant.parse(extras.getString("heure"));
+            result = DirectionsApi.newRequest(getBuilder().build()).mode(TravelMode.TRANSIT)
+                    .transitMode(TransitMode.TRAIN)
+                    .origin(depart)
+                    .destination(arrivee).departureTime(heure).await();
+            addMarkersToMap(result);
+            addPolyline(result);
+            LatLng middle = new LatLng((result.routes[0].legs[0].startLocation.lat + result.routes[0].legs[0].endLocation.lat) / 2,
+                    (result.routes[0].legs[0].startLocation.lng + result.routes[0].legs[0].endLocation.lng) / 2);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(middle, 17.f));
+        }
+        catch(IOException  | InterruptedException | ApiException e)
+        {
+            Log.d("Erreur", "onItemClick: "+e);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Drawer navigation
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            loadMapWithPredefinedValues(extras);
+            //The key argument here must match that used in the other activity
+        }
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
